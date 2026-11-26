@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In Da Kitchen Cookbook</title>
+<meta name="description" content="A family cookbook for recipes, traditions, and good food.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--ink:#171714;--cream:#f5f0e7;--paper:#fffdf8;--gold:#b89455;--muted:#827b70;--line:#e7dfd2}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
+header{background:var(--ink);color:var(--cream);padding:24px clamp(20px,5vw,72px) 20px;border-bottom:2px solid var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1300px;margin:auto}
+.brand{font:600 clamp(25px,4vw,42px) "Playfair Display",serif;letter-spacing:.02em}.brand span{color:var(--gold)}
+.tag{color:#c9c0b1;font-size:11px;letter-spacing:.23em;text-transform:uppercase;margin-top:7px}
+nav{display:flex;gap:10px;flex-wrap:wrap}button,.btn{border:1px solid var(--gold);background:transparent;color:inherit;padding:11px 16px;border-radius:2px;font:600 12px "DM Sans";letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+button.gold{background:var(--gold);color:#171714}button:hover{filter:brightness(1.08)}
+.hero{max-width:1300px;margin:0 auto;padding:56px clamp(20px,5vw,72px) 34px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.kicker{color:#987744;text-transform:uppercase;letter-spacing:.24em;font-size:11px;font-weight:700}
+h1,h2,h3{font-family:"Playfair Display",serif;font-weight:600}h1{font-size:clamp(42px,6vw,76px);line-height:1.02;margin:16px 0}
+.hero p{color:var(--muted);line-height:1.8;max-width:510px}
+.hero-art{min-height:280px;background:linear-gradient(120deg,rgba(20,18,14,.15),rgba(20,18,14,.55)),url('https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85') center/cover;display:flex;align-items:end;padding:22px;color:white}
+.hero-art span{font:italic 22px "Playfair Display"}
+main{max-width:1300px;margin:auto;padding:10px clamp(20px,5vw,72px) 80px}
+.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding:24px 0}
+.search{background:var(--paper);border:1px solid var(--line);padding:13px 15px;min-width:min(100%,280px);font:14px "DM Sans"}
+.filters{display:flex;gap:8px;flex-wrap:wrap}.filters button{color:var(--ink);border-color:var(--line);padding:9px 12px}.filters button.active{background:var(--ink);color:white;border-color:var(--ink)}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin:24px 0}.section-head h2{font-size:34px;margin:0}.section-head p{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--paper);border:1px solid var(--line);cursor:pointer;transition:transform .2s}.card:hover{transform:translateY(-4px)}
+.card img{width:100%;height:220px;object-fit:cover;background:#ddd}.cardbody{padding:19px}.category{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#987744;font-weight:700}.card h3{font-size:23px;margin:9px 0}.meta{font-size:12px;color:var(--muted);display:flex;gap:14px}
+.empty{background:var(--paper);padding:45px;text-align:center;color:var(--muted);border:1px dashed var(--gold)}
+footer{background:var(--ink);color:#c9c0b1;text-align:center;padding:35px 20px;font:italic 17px "Playfair Display"}
+dialog{border:0;padding:0;max-width:760px;width:calc(100% - 28px);max-height:90vh;background:var(--paper);color:var(--ink);box-shadow:0 20px 80px #0005}
+dialog::backdrop{background:#111b}.modal{padding:clamp(20px,4vw,38px);overflow:auto;max-height:90vh}.modal-top{display:flex;justify-content:space-between;gap:15px;align-items:center}.modal h2{font-size:34px;margin:12px 0}.modal img{width:100%;max-height:330px;object-fit:cover;margin:10px 0}
+.detail p,.detail li{line-height:1.8;color:#514c44}.detail h3{font-size:23px;border-bottom:1px solid var(--line);padding-bottom:8px}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:14px 0 6px}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);background:white;font:14px "DM Sans";color:var(--ink)}textarea{min-height:100px;resize:vertical}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hint{color:var(--muted);font-size:12px;line-height:1.6}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.actions button{color:var(--ink)}
+#status{font-size:12px;color:var(--muted);margin-top:12px}
+@media(max-width:800px){.hero{grid-template-columns:1fr;padding-top:38px}.hero-art{min-height:210px}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.card img{height:230px}.formgrid{grid-template-columns:1fr}.section-head{display:block}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand">IN DA <span>KITCHEN</span> COOKBOOK</div><div class="tag">A collection of family favorites</div></div><nav><button id="loginBtn">Owner sign in</button><button class="gold" id="addBtn" hidden>+ Add recipe</button></nav></div></header>
+<section class="hero"><div><div class="kicker">Gather • Cook • Share</div><h1>Good food.<br><span style="color:#987744">Great memories.</span></h1><p>Welcome to our family table. Browse the dishes we love, discover something delicious, and keep the recipes that bring everyone together.</p></div><div class="hero-art"><span>Made with love, served with pride.</span></div></section>
+<main><div class="toolbar"><input class="search" id="search" placeholder="Search recipes or ingredients…"><div class="filters" id="filters"></div></div>
+<div class="section-head"><div><div class="kicker">From our kitchen to yours</div><h2>Explore the cookbook</h2></div><p id="count">Loading recipes…</p></div><div class="grid" id="recipes"></div><div id="status">Connect your free Supabase project to enable shared recipes.</div></main>
+<footer>“The best memories are made around the table.”</footer>
+<dialog id="recipeDialog"><div class="modal" id="recipeContent"></div></dialog>
+<dialog id="formDialog"><div class="modal"><div class="modal-top"><div><div class="kicker">Your kitchen, your collection</div><h2 id="formTitle">Add a recipe</h2></div><button id="closeForm">Close</button></div>
+<form id="recipeForm"><input type="hidden" id="recipeId"><label>Recipe name</label><input id="name" required placeholder="Grandma's Sunday roast"><div class="formgrid"><div><label>Category</label><select id="category"><option>Main dishes</option><option>Appetizers</option><option>Breakfast</option><option>Soul food</option><option>Seafood</option><option>Side dishes</option><option>Desserts</option><option>Drinks</option><option>Other</option></select></div><div><label>Prep + cook time</label><input id="time" placeholder="45 minutes"></div><div><label>Servings</label><input id="servings" placeholder="6 servings"></div><div><label>Recipe photo</label><input id="photo" type="file" accept="image/*"></div></div><label>Short description</label><textarea id="description" placeholder="What makes this recipe special?"></textarea><label>Ingredients (one per line)</label><textarea id="ingredients" required placeholder="2 cups flour&#10;1 tsp salt"></textarea><label>Instructions (one step per line)</label><textarea id="instructions" required placeholder="Preheat the oven…&#10;Mix the ingredients…"></textarea><label>Family notes (optional)</label><textarea id="notes" placeholder="Tips, substitutions, who shared it…"></textarea><p class="hint">Photos are stored in your shared cookbook when cloud storage is connected.</p><div class="actions"><button class="gold" type="submit">Save recipe</button><button type="button" id="cancelForm">Cancel</button></div></form></div></dialog>
+<dialog id="loginDialog"><div class="modal"><div class="modal-top"><div><div class="kicker">Private kitchen access</div><h2>Owner sign in</h2></div><button id="closeLogin">Close</button></div><form id="loginForm"><label>Email</label><input id="email" type="email" required><label>Password</label><input id="password" type="password" required><div class="actions"><button class="gold">Sign in</button></div></form><p class="hint">Create your owner account in Supabase Authentication first. Public visitors do not need to sign in.</p></div></dialog>
+<script>
+const SUPABASE_URL="https://izdyrrvmmzmufoxnwqlq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_sTH-6PIGITATjN6VYXdGcw_yKEFB527";
+const configured=!SUPABASE_URL.startsWith("YOUR_")&&!SUPABASE_ANON_KEY.startsWith("YOUR_");
+const db=configured?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+let owner=false,allRecipes=[],category="All";
+const demo=[
+{id:"demo1",name:"Sunday Fried Chicken",category:"Main dishes",time:"55 minutes",servings:"6 servings",description:"Crispy, golden comfort food made for sharing.",ingredients:["1 whole chicken, cut into pieces","2 cups buttermilk","2 cups seasoned flour","Salt, pepper and paprika"],instructions:["Season chicken and soak in buttermilk for at least 30 minutes.","Dredge each piece in seasoned flour.","Fry in batches until golden and cooked through.","Rest on a rack before serving."],notes:"A family table classic.",image_url:"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80"},
+{id:"demo2",name:"Creamy Baked Mac & Cheese",category:"Side dishes",time:"50 minutes",servings:"8 servings",description:"Rich, cheesy, and baked until beautifully golden.",ingredients:["1 lb elbow macaroni","3 cups shredded cheddar","2 cups milk","2 tbsp butter"],instructions:["Cook macaroni until just tender.","Stir together cheese, milk and butter.","Fold in macaroni and transfer to a baking dish.","Bake at 350°F until bubbling and golden."],notes:"Add a little smoked paprika for depth.",image_url:"https://images.unsplash.com/photo-1543339494-b4cd4f7ba686?auto=format&fit=crop&w=900&q=80"},
+{id:"demo3",name:"Peach Cobbler",category:"Desserts",time:"1 hour",servings:"8 servings",description:"Warm peaches under a buttery, golden topping.",ingredients:["6 cups sliced peaches","¾ cup sugar","1 cup flour","1 cup milk","½ cup melted butter"],instructions:["Toss peaches with half the sugar.","Whisk flour, remaining sugar and milk.","Pour butter into a baking dish, add batter and peaches.","Bake at 375°F until golden and bubbling."],notes:"Best served warm with vanilla ice cream.",image_url:"https://images.unsplash.com/photo-1568571780765-9276ac8b75a6?auto=format&fit=crop&w=900&q=80"}
+];
+const $=id=>document.getElementById(id);
+function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function setStatus(s){$("status").textContent=s;}
+async function refresh(){
+ if(!db){allRecipes=demo;setStatus("Preview mode: sample recipes are shown. Follow SETUP.md to connect your own shared cookbook.");}
+ else{const {data,error}=await db.from("recipes").select("*").order("created_at",{ascending:false});if(error){setStatus(error.message);allRecipes=[];}else{allRecipes=data||[];setStatus(owner?"Owner mode: your changes sync to the shared cookbook.":"Public viewing mode.");}}
+ render();
+}
+function render(){
+ const cats=["All",...new Set(allRecipes.map(r=>r.category).filter(Boolean))];
+ $("filters").innerHTML=cats.map(c=>`<button class="${category===c?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+ $("filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{category=b.dataset.cat;render()});
+ const q=$("search").value.toLowerCase();
+ const list=allRecipes.filter(r=>(category==="All"||r.category===category)&&[r.name,r.category,r.description,(r.ingredients||[]).join(" ")].join(" ").toLowerCase().includes(q));
+ $("count").textContent=`${list.length} ${list.length===1?"recipe":"recipes"}`;
+ $("recipes").innerHTML=list.length?list.map(r=>`<article class="card" data-id="${esc(r.id)}"><img src="${esc(r.image_url||"https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80")}" alt="${esc(r.name)}"><div class="cardbody"><div class="category">${esc(r.category||"Family favorite")}</div><h3>${esc(r.name)}</h3><div class="meta"><span>◷ ${esc(r.time||"Time varies")}</span><span>♧ ${esc(r.servings||"")}</span></div></div></article>`).join(""):`<div class="empty">No recipes found. Try another search.</div>`;
+ $("recipes").querySelectorAll(".card").forEach(c=>c.onclick=()=>showRecipe(allRecipes.find(r=>r.id===c.dataset.id)));
+ $("addBtn").hidden=!owner;
+ $("loginBtn").textContent=owner?"Sign out":"Owner sign in";
+ $("loginBtn").onclick=toggleAuth;
+}
+function showRecipe(r){
+ if(!r)return;
+ $("recipeContent").innerHTML=`<div class="modal-top"><div class="category">${esc(r.category||"Family favorite")}</div><button onclick="$('recipeDialog').close()">Close</button></div><h2>${esc(r.name)}</h2><div class="meta"><span>◷ ${esc(r.time||"")}</span><span>♧ ${esc(r.servings||"")}</span></div>${r.image_url?`<img src="${esc(r.image_url)}" alt="${esc(r.name)}">`:""}<p>${esc(r.description||"")}</p><div class="detail"><h3>Ingredients</h3><ul>${(r.ingredients||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h3>Instructions</h3><ol>${(r.instructions||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${r.notes?`<h3>Family notes</h3><p>${esc(r.notes)}</p>`:""}</div>${owner?`<div class="actions"><button onclick="editRecipe('${esc(r.id)}')">Edit recipe</button><button onclick="deleteRecipe('${esc(r.id)}')">Delete recipe</button></div>`:""}`;
+ $("recipeDialog").showModal();
+}
+function toggleAuth(){if(owner){db.auth.signOut().then(()=>{owner=false;refresh()})}else $("loginDialog").showModal()}
+$("loginBtn").onclick=toggleAuth;$("addBtn").onclick=()=>openForm();$("search").oninput=render;
+$("closeLogin").onclick=()=>$("loginDialog").close();
+$("loginForm").onsubmit=async e=>{e.preventDefault();if(!db)return alert("Connect Supabase first.");const {error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error)alert(error.message);else{$("loginDialog").close();}};
+if(db)db.auth.onAuthStateChange((_event,session)=>{owner=!!session;refresh()});
+function openForm(r=null){$("recipeForm").reset();$("recipeId").value=r?.id||"";$("formTitle").textContent=r?"Edit recipe":"Add a recipe";if(r){$("name").value=r.name||"";$("category").value=r.category||"Other";$("time").value=r.time||"";$("servings").value=r.servings||"";$("description").value=r.description||"";$("ingredients").value=(r.ingredients||[]).join("\n");$("instructions").value=(r.instructions||[]).join("\n");$("notes").value=r.notes||"";}$("formDialog").showModal();}
+window.editRecipe=id=>{const r=allRecipes.find(x=>x.id===id);$("recipeDialog").close();openForm(r)};
+$("closeForm").onclick=$("cancelForm").onclick=()=>$("formDialog").close();
+$("recipeForm").onsubmit=async e=>{e.preventDefault();if(!owner||!db)return alert("Owner sign-in and cloud setup are required to save recipes.");const id=$("recipeId").value;let image_url=allRecipes.find(r=>r.id===id)?.image_url||null;const file=$("photo").files[0];if(file){const path=`${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;const {error}=await db.storage.from("recipe-photos").upload(path,file,{upsert:false});if(error)return alert(error.message);image_url=db.storage.from("recipe-photos").getPublicUrl(path).data.publicUrl;}
+const payload={name:$("name").value.trim(),category:$("category").value,time:$("time").value,servings:$("servings").value,description:$("description").value,ingredients:$("ingredients").value.split("\n").map(x=>x.trim()).filter(Boolean),instructions:$("instructions").value.split("\n").map(x=>x.trim()).filter(Boolean),notes:$("notes").value,image_url};
+const result=id?await db.from("recipes").update(payload).eq("id",id):await db.from("recipes").insert(payload);
+if(result.error)return alert(result.error.message);$("formDialog").close();refresh();};
+window.deleteRecipe=async id=>{if(!owner||!confirm("Delete this recipe permanently?"))return;const {error}=await db.from("recipes").delete().eq("id",id);if(error)alert(error.message);else{$("recipeDialog").close();refresh();}};
+refresh();
+</script></body></html>
